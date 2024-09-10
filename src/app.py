@@ -7,7 +7,9 @@ import plotly.graph_objects as go
 import re
 import pathlib
 
-app = Dash(__name__, suppress_callback_exceptions=True,external_stylesheets=[dbc.themes.COSMO])
+external_style = ['https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css']
+
+app = Dash(__name__, suppress_callback_exceptions=True,external_stylesheets=[dbc.themes.COSMO,external_style])
 server = app.server
 
 pd.options.mode.chained_assignment = None
@@ -17,6 +19,7 @@ DATA_PATH = PATH.joinpath("data").resolve()
 
 df=pd.read_excel(DATA_PATH.joinpath('2024.02.28_Updated Transp. Index 2023 FC.xlsx'),sheet_name='Full Dataset_Board', nrows=500)
 dfnz2 = pd.read_excel(DATA_PATH.joinpath('2024.04.04-NZ for Descriptive Testing_not full QC w sectors.xlsx'),sheet_name='Dissertation Net Zero & Governa', nrows=496)
+
 #dfpivot = pd.read_csv(DATA_PATH.joinpath('Pivoted_master_data.csv'))
 
 def company_list(sector):
@@ -40,8 +43,8 @@ def company_list_from_sector(sector):
 
 
 def trafficlight(sector,company_list):
-    dfcs = df.loc[df['GICS.Sector'] == sector,['Company.Name','CM7a.GHG.Emissions.','CM7b.GHG.Emissions.'
-                                                       ,'CM7c.GHG.Emissions.','TCFD New','CM9.Land.use.and.eco','Water amount Index','water stress index','Revenue']]
+    dfcs = df.loc[df['GICS.Sector'] == sector,['Company.Name','CM7a.GHG.Emissions.','CM7b.GHG.Emissions.','CM7c.GHG.Emissions.','CM9.Land.use.and.eco','Water amount Index','water stress index']]
+    
     dfcs.rename(columns={"Company.Name": "Company","CM7a.GHG.Emissions.": "GHG Scope 1 Emission", "CM7b.GHG.Emissions.": "GHG Scope 2 Emission",
                      "CM7c.GHG.Emissions.": "GHG Scope 3 Emission", "TCFD New": "TCFD",
                      "CM9.Land.use.and.eco": "Biodiversity", "Water amount Index": "Water Disclosure",
@@ -61,18 +64,53 @@ def trafficlight(sector,company_list):
                      'Partial Disclosure': '#FFD100',
                      'No Disclosure': '#F43A00'}
     
-    fig = px.scatter(dfcs_melted, y="Company", x="Metric", color="Status",
-                     color_discrete_map=color_mapping,
-                     #width = 2000, 
-                     height = 1000, 
-                     #title='Disclosure Status for Consumer Staples Environmental Metrics'
-                    )
-    fig.update_traces(marker_size=25)
-    fig.update_layout(plot_bgcolor="white", font_family='Helvetica', title_font_family="Helvetica",
-                      title_x=0.5,xaxis=dict(side="top"),
-                      legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=None))
+#     fig = px.scatter(dfcs_melted, y="Company", x="Metric", color="Status",
+#                      color_discrete_map=color_mapping,
+#                      #width = 2000, 
+#                      height = 1000, 
+#                      #title='Disclosure Status for Consumer Staples Environmental Metrics'
+#                     )
+#     fig.update_traces(marker_size=25)
+#     fig.update_layout(plot_bgcolor="white", font_family='Helvetica', title_font_family="Helvetica",
+#                       title_x=0.5,xaxis=dict(side="top"),
+#                       legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=None))
+#     fig.update_yaxes(categoryorder='category descending', title=None)
+#     wrapped_labels = [label[:[m.start() for m in re.finditer(r' ', label)][0]] + '<br>' + label[[m.start() for m in re.finditer(r' ', label)][0]:] if label.find(' ')>=2 else label for label in dfcs_melted['Metric'].unique().tolist()]
+#     fig.update_xaxes(tickmode='array', tickvals=list(range(len(dfcs_melted['Metric'].unique().tolist()))), ticktext=wrapped_labels)
+    
+#     fig.update_xaxes(title=None)
+#     fig.add_shape(
+#         type="line",
+#         x0=0,
+#         y0=1,
+#         x1=1,
+#         y1=1,
+#         line=dict(
+#             color="black",
+#             width=1,
+#         ),
+#         xref="paper",
+#         yref="paper"
+#    )
+    xaxis_order = ['GHG Scope 1 Emission','GHG Scope 2 Emission','GHG Scope 3 Emission','Water Disclosure','Water Stress Disclosure','Biodiversity']
+    
+    dfcs_melted['Company '] = dfcs_melted['Company'].apply(lambda x: x[:x.find(' ', x.find(' ') + 1)] + '<br>' + x[x.find(' ', x.find(' ') + 1) + 1:] if x.count(' ') >= 2 else x)
+
+    fig = px.scatter(dfcs_melted, y="Company ", x="Metric", color="Status",
+                 color_discrete_map=color_mapping,
+                 height = 1000, title='Environmental Metrics Disclosure')
+    fig.update_traces(marker_size=34)
+    fig.update_layout(plot_bgcolor="white", font_family='Helvetica', title_font_family="Helvetica", title_x=0.5,
+                 legend=dict( yanchor="bottom",orientation="h",  xanchor="right", x=1, title=None), font=dict(size=15),
+                 margin=dict(t=190),title_font_size=30,xaxis_tickformat='wrap',
+                 xaxis=dict(side="top",categoryorder='array', categoryarray= xaxis_order))
     fig.update_yaxes(categoryorder='category descending', title=None)
-    fig.update_xaxes(title=None)
+    fig.update_xaxes(title=None, tickformat='wrap')
+
+    max_label_length = 7
+    wrapped_labels = [label[:label.find(' ')] + '<br>' + label[label.find(' '):] if label.find(' ')>0 else label for label in xaxis_order]
+    fig.update_xaxes(tickmode='array', tickvals=list(range(len(xaxis_order))), ticktext=wrapped_labels)
+
     fig.add_shape(
         type="line",
         x0=0,
@@ -99,9 +137,9 @@ def tghg1(sector,company_list):
     tghg1_sel10 = tghg1[masknz1].sort_values(by='Total GHG1', axis=0, ascending=False)
     tghg1_sel10['Total GHG1'] = tghg1_sel10['Total GHG1']/1000
     
-    fontsize = 170/tghg1_sel10.shape[0]
-    if (fontsize > 17):
-        fontsize = 17
+    fontsize = 150/tghg1_sel10.shape[0]
+    if (fontsize > 15):
+        fontsize = 15
     
     fig22 = px.bar(tghg1_sel10, x='Company', y='Total GHG1', text='Total GHG1', color_discrete_sequence=['#2774AE'], height=780)
     fig22.update_layout(plot_bgcolor="white", font_family='Helvetica', title_font_family="Helvetica", font=dict(size=fontsize))
@@ -140,9 +178,9 @@ def nghg1(sector,company_list):
     tnghg1_merged['Normalised GHG1 Rounded'] = pd.to_numeric(tnghg1_merged['Normalised GHG1']).round(2)
     tnghg1_merged = tnghg1_merged.sort_values(by='Normalised GHG1', ascending=False)
 
-    fontsize = 170/tnghg1_merged.shape[0]
-    if (fontsize > 17):
-        fontsize = 17
+    fontsize = 150/tnghg1_merged.shape[0]
+    if (fontsize > 15):
+        fontsize = 15
     
     fig2 = px.bar(tnghg1_merged, x='Company', y='Normalised GHG1',text='Normalised GHG1 Rounded',color_discrete_sequence=['#2774AE'],height = 780)
     fig2.update_layout(plot_bgcolor="white", font_family='Helvetica', title_font_family="Helvetica",font=dict(size=fontsize))
@@ -187,9 +225,9 @@ def tghg2(sector,company_list):
                      'market-based': '#2774AE',
                      'location-based': '#FFB81C'}
     
-    fontsize = 540/tghg2_melted.shape[0]
-    if (fontsize > 17):
-        fontsize = 17
+    fontsize = 450/tghg2_melted.shape[0]
+    if (fontsize > 15):
+        fontsize = 15
     
     fig32 = px.bar(tghg2_melted, x="Company", y="value", color="Scope 2 Category", barmode="group", text='value_rounded', color_discrete_map=color_mapping, height = 780)
     
@@ -257,9 +295,9 @@ def nghg2(sector,company_list):
                      'market-based': '#2774AE',
                      'location-based': '#FFB81C'}
     
-    fontsize = 540/tnghg2_melted.shape[0]
-    if (fontsize > 17):
-        fontsize = 17
+    fontsize = 450/tnghg2_melted.shape[0]
+    if (fontsize > 15):
+        fontsize = 15
     
     fig322 = px.bar(tnghg2_melted, x="Company", y="value",
                     color="Scope 2 Category", barmode="group",text='value_rounded',color_discrete_map=color_mapping,height = 780)
@@ -393,9 +431,9 @@ def tnghg3(sector,company_list,k1,pp):
 
     tnghg33_merged = tnghg33_merged.sort_values(by=[k1,'Company'], axis = 0, ascending=False)
     
-    fontsize = 170/tnghg33_merged.shape[0]
-    if (fontsize > 17):
-        fontsize = 17
+    fontsize = 150/tnghg33_merged.shape[0]
+    if (fontsize > 15):
+        fontsize = 15
     
     fig2 = px.bar(tnghg33_merged, x='Modified Labels', y=k1,text=k2 ,color_discrete_sequence=['#2774AE'], height = 1000)
     
@@ -471,9 +509,9 @@ def biodiver(sector,company_list):
     mask7 = dfbi['CompanyName'].isin(company_list)
     dfbi_prev10 = dfbi[mask7].sort_values(by='Normalised Biodiversity Areas', axis=0, ascending=False)
 
-    fontsize = 170/dfbi_prev10.shape[0]
-    if (fontsize > 17):
-        fontsize = 17
+    fontsize = 150/dfbi_prev10.shape[0]
+    if (fontsize > 15):
+        fontsize = 15
     
     fig7 = px.bar(dfbi_prev10, x="CompanyName", y="Normalised Biodiversity Areas",text='value_rounded', color_discrete_sequence=['#2774AE','#FFB81C','#F47C30'],barmode="group", height = 780)
     fig7.update_layout(plot_bgcolor="white", font_family='Helvetica', title_font_family="Helvetica",
@@ -527,11 +565,14 @@ def enviromentalgovernacemetrics(sector,company_list):
                      'No': '#F43A00',
                      'Partial': '#FFD100'}
     
-    fig = px.scatter(emg_melted, y="Company", x="Metric", color="Status",
+    emg_melted['Company '] = emg_melted['Company'].apply(lambda x: x[:x.find(' ', x.find(' ') + 1)] + '<br>' + x[x.find(' ', x.find(' ') + 1) + 1:] if x.count(' ') >= 2 else x)
+
+    
+    fig = px.scatter(emg_melted, y="Company ", x="Metric", color="Status",
                  color_discrete_map=color_mapping,height = 920, 
                  title='Environmental Metrics Governance')
     fig.update_traces(marker_size=34)
-    fig.update_layout(plot_bgcolor="white", font=dict(family="Verdana",size=17), title_font_family="Helvetica", title_x=0.5,
+    fig.update_layout(plot_bgcolor="white", font=dict(family="Verdana",size=15), title_font_family="Helvetica", title_x=0.5,
                  legend=dict( yanchor="bottom",orientation="h",  xanchor="right", x=1, title=None),
                  margin=dict(t=190),title_font_size=30,xaxis_tickformat='wrap',
                  xaxis=dict(side="top",categoryorder='array', categoryarray= emg_melted["Company"].unique()))
@@ -569,9 +610,9 @@ def tcfdpercentage(sector,company_list):
     mask = tcfd['Company'].isin(company_list)
     tcfd = tcfd[mask].sort_values(by=['TCFD average','Company'],ascending=False)
     
-    fontsize = 160/tcfd.shape[0]
-    if (fontsize > 16):
-        fontsize = 16
+    fontsize = 150/tcfd.shape[0]
+    if (fontsize > 15):
+        fontsize = 15
     
     fig7 = px.bar(tcfd, x='Company', y='TCFD average',text='label',
               color_discrete_sequence=['#003B5C'],barmode="group")
@@ -606,9 +647,9 @@ def boardmember(sector,company_list):
     mask = pobm['Company'].isin(company_list)
     pobm = pobm[mask].sort_values(by=['pobm','Company'],ascending=False)
     
-    fontsize = 170/pobm.shape[0]
-    if (fontsize > 17):
-        fontsize = 17
+    fontsize = 150/pobm.shape[0]
+    if (fontsize > 15):
+        fontsize = 15
     
     fig8 = px.bar(pobm, x='Company', y='pobm',text='label',
               color_discrete_sequence=['#003B5C'],barmode="group")
@@ -654,9 +695,10 @@ def environmentalgoals(sector,company_list):
     mask = egoal['Company'].isin(company_list)
     egoal = egoal[mask].fillna('Not Applicable')
 
-    egoal.loc[222,'"Net Zero" or "Carbon neutral" mentioned in Proxy Statement'] = 'Not Applicable'
+    #egoal.loc[222,'"Net Zero" or "Carbon neutral" mentioned in Proxy Statement'] = 'Not Applicable'
 
     egoal.sort_values(by='Company')
+    
     
     egoal_melted = egoal.melt(id_vars = 'Company', var_name='Metric', value_name='Status')
     egoal_melted = egoal_melted.sort_values(by=['Metric','Company'])
@@ -676,11 +718,16 @@ def environmentalgoals(sector,company_list):
                      'Validated': '#2774AE',
                      'Committed': '#FFD100'}
     
-    fig9 = px.scatter(egoal_melted, y="Company", x="Metric", color="Status",
+    #egoal_melted['Company']=egoal_melted['Company'].astype('str')
+    
+    egoal_melted['Company '] = egoal_melted['Company'].apply(lambda x: x[:x.find(' ', x.find(' ') + 1)] + '<br>' + x[x.find(' ', x.find(' ') + 1) + 1:] if x.count(' ') >= 2 else x)
+
+    
+    fig9 = px.scatter(egoal_melted, y="Company ", x="Metric", color="Status",
                  color_discrete_map=color_mapping,height = 920, 
                  title='Environmental Goals')
     fig9.update_traces(marker_size=34)
-    fig9.update_layout(plot_bgcolor="white", font=dict(family="Verdana",size=12), title_font_family="Helvetica", title_x=0.5,
+    fig9.update_layout(plot_bgcolor="white", font=dict(family="Verdana",size=11), title_font_family="Helvetica", title_x=0.5,
                  legend=dict( yanchor="bottom",orientation="h",  xanchor="right", x=1, title=None),
                  margin=dict(t=190),title_font_size=30,xaxis_tickformat='wrap',
                  xaxis=dict(side="top",categoryorder='array', categoryarray= column_order))
@@ -818,7 +865,7 @@ def index_calculator(sector, company_list, governance_weight, goals_weight, perf
     mask = egoal['Company'].isin(company_list)
     egoal = egoal[mask].fillna('Not Applicable')
 
-    egoal.loc[222,'"Net Zero" or "Carbon neutral" mentioned in Proxy Statement'] = 'Not Applicable'
+    #egoal.loc[222,'"Net Zero" or "Carbon neutral" mentioned in Proxy Statement'] = 'Not Applicable'
     
     #egoal = environmentalgoals(sector,company_list)[1]
     egoal22 = egoal.copy()
@@ -1217,7 +1264,7 @@ card11=dbc.Card([
 ],className="m-1")
 
 card12=dbc.Card([
-    dbc.CardHeader("Disclosure Status for Consumer Staples Environmental Metrics",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Disclosure Status for Environmental Metrics",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
     dbc.CardBody(
         [
             dbc.Row([dbc.Col(dcc.Graph(id="trafficlight"))])
@@ -1759,19 +1806,32 @@ tab2card3=dbc.Card([
                 
                 html.Br(),
                 dbc.Row([
-                    html.H5(["Environmental Performance Index is the average sector-based ",
-                            html.Span("percentile ranking", id="percentile_tooltip"),
-                            " of the following Metrics normalised by revenue"]),
-                     dbc.Tooltip(
-                         "Percentile ranking indicates the relative position of a score within a distribution, showing the percentage of scores that fall below it.",
-                         style={"textDecoration": "underline", "cursor": "pointer"},
-                         target="percentile_tooltip",
-                     ),
+                    dbc.Col([
+                        html.H5(["Environmental Performance Index is the average sector-based percentile ranking of the following Metrics normalised by revenue"])],width=9),
+                    dbc.Col([dbc.Button("What is Percentile Ranking?", id="per_rank_exp", n_clicks=0, outline=True, color="secondary", className="me-1")],width=3),
+                    #html.H5([""]),
+                            #html.Span("percentile ranking", id="percentile_tooltip"),
+                            
+#                      dbc.Tooltip(
+#                          "Percentile ranking indicates the relative position of a score within a distribution, showing the percentage of scores that fall below it.",
+#                          style={"textDecoration": "underline", "cursor": "pointer"},
+#                          target="percentile_tooltip",
+#                      ),
+#                     dbc.Button("Open Offcanvas", id="open-offcanvas", n_clicks=0),
+                    dbc.Offcanvas(
+                        html.P(
+                            "Percentile ranking indicates the relative position of a score within a distribution, showing the percentage of scores that fall below it."
+                        ),
+                        id="per_rank_exp_off",
+                        title="Percentile Rank",
+                        is_open=False,
+                    ),
                 ]),
                 dbc.Row(
                     [
                         dbc.Col([
                             dbc.Label("Scope 1 Emission", width="auto",style={'font-style': 'italic'}),
+                            html.I(className="bi bi-info-circle-fill me-2"),
                             dbc.Input(type="number", value=179.211, id="ghg1_input"),
                             dbc.InputGroupText("kilo metric tons")],
                             className="me-3",
@@ -1806,7 +1866,11 @@ tab2card3=dbc.Card([
                             className="me-3",
                         ),
                         dbc.Col([
-                            dbc.Label("Biodiversity", width="auto",style={'font-style': 'italic'}),
+                            dbc.Label("Biodiversity", width="auto",id='biod_tooltip',style={'font-style': 'italic'}),
+                            dbc.Tooltip("Biodiversity indicates the total area of sites owned, leased, or managed in or adjacent to protected areas or key biodiversity areas ",
+                         style={"textDecoration": "underline", "cursor": "pointer"},
+                         target="biod_tooltip",
+                                       ),
                             dbc.Input(type="number", value=119537, id="biod_input"),
                             dbc.InputGroupText("hectares")],
                             className="me-3",
@@ -2392,6 +2456,17 @@ def download_func(n_clicks):
     return dcc.send_file(
         FILE_PATH.joinpath('Index Calculation.pdf')
     )
+
+##off canvas 
+@app.callback(
+    Output("per_rank_exp_off", "is_open"),
+    Input("per_rank_exp", "n_clicks"),
+    [State("per_rank_exp_off", "is_open")],
+)
+def toggle_offcanvas(n1, is_open):
+    if n1:
+        return not is_open
+    return is_open
 
 
 
