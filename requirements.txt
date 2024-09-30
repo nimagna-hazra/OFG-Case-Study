@@ -6,3 +6,4 @@ plotly==5.9.0
 gunicorn
 dash-tools
 dash-auth
+openpyxl
