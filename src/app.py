@@ -6,11 +6,19 @@ import numpy as np
 import plotly.graph_objects as go
 import re
 import pathlib
+import dash_auth
 
 external_style = ['https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css']
 
 app = Dash(__name__, suppress_callback_exceptions=True,external_stylesheets=[dbc.themes.COSMO,external_style])
+app.title = 'Center for Impact Case Study'
 server = app.server
+
+# auth = dash_auth.BasicAuth(
+#     app,
+#     {'nimagna': 'uclacfi',
+#      'nimagna2':'uclacfi2'}
+# )
 
 pd.options.mode.chained_assignment = None
 
@@ -147,7 +155,7 @@ def tghg1(sector,company_list):
     fig22.update_yaxes(title=None)
     fig22.update_layout(
     title=go.layout.Title(
-        text="Total GHG Scope 1 Emissions<br><sup>(in kilo-metric tons)</sup>",
+        text="Total GHG Scope 1 Emissions<br><sup>(in thousand metric tons)</sup>",
         #xref="paper",
         x=0.5,
         font_size=30
@@ -245,7 +253,7 @@ def tghg2(sector,company_list):
     fig32.update_yaxes(title=None)
     fig32.update_layout(
     title=go.layout.Title(
-        text="Total GHG Scope 2 Emissions<br><sup>(in kilo-metric tons)</sup>",
+        text="Total GHG Scope 2 Emissions<br><sup>(in thousand metric tons)</sup>",
         #xref="paper",
         x=0.5,
         font_size = 30
@@ -368,7 +376,7 @@ def tnghg3(sector,company_list,k1,pp):
     if (pp==1):
         k3 = k1[:-1] + " Scope 3 Emissions<br><sup>(in metric tons per $M revenue)</sup>"
     else:
-        k3 = k1[:-1] + " Scope 3 Emissions<br><sup>(in kilo-metric tons)</sup>"
+        k3 = k1[:-1] + " Scope 3 Emissions<br><sup>(in thousand metric tons)</sup>"
     tghg3 = dfnz2.loc[:,['Enter the full company name', 'Enter the company\'s Scope 3 emissions in metric tons of CO2e.',
                   'Does the company report Category 1 (purchased goods and services) emissions?',
                   'Does the company report Category 2 (capital goods) emissions?',
@@ -658,7 +666,7 @@ def boardmember(sector,company_list):
     fig8.update_yaxes(title=None)
     fig8.update_layout(
         title=go.layout.Title(
-            text="Percentage of board members with Environmental/Sustainability Capabilities<br><sup></sup>",
+            text="Percentage of Board Members with Environmental/Sustainability Capabilities<br><sup></sup>",
             #xref="paper",
             x=0.5
         ))
@@ -1209,36 +1217,87 @@ navbar = dbc.Navbar(
             html.A(
                 dbc.Row(
                     [
-                        dbc.Col(html.Img(src='/assets/Impact_Logo_Wht_PMScoated.png', height="30px"))
+                        dbc.Col(html.Img(src='/assets/UCLAAndersonSOM_Wht_PMScoated.png', height="30px"))
                     ],
                     align="center",
                     className="g-0",
                 ),
-                href="#",
+                href="https://www.anderson.ucla.edu/",
+                target="_blank",
                 style={"textDecoration": "none"},
             ),
             dbc.Row(
-                    [dbc.Col(dbc.NavbarBrand("OFG Case Study", className="ms-2")),
+                    [dbc.Col(dbc.NavbarBrand("Corporate Sustainability Case Study", className="ms-2")),
                      dbc.Col(width=1)
                     ],
                     align="center",
                     className="g-0",
                 ),
-            html.A()
+            html.A(dbc.Row(
+                    [
+                        dbc.Col(html.Img(src='/assets/2022IMPACT New Center Logo2.png', height="40px"))
+                    ],
+                    align="center",
+                    className="g-0",
+                ),
+                   href="https://www.anderson.ucla.edu/about/centers/impactanderson",
+                   target="_blank",
+                   style={"textDecoration": "none"},
+                  )
         ],fluid=True
     ),
     color="#313339",
     dark=True,
 )
 
+intro = html.Div([
+    html.Br(),
+    html.H5("This page provides a comparitive sector-based analysis based on the following metrics:")])
+
+list_group1 = html.Div(
+    [
+        dbc.ListGroup(
+            [
+                html.A(dbc.ListGroupItem("Disclosure Status for Environmental Metrics", color="secondary", action=True), href="#dsfem", style={'text-decoration':'none','font-style': 'italic'}),
+                html.A(dbc.ListGroupItem("GHG Scope 1 Emissions", color="secondary", action=True), href="#gs1e", style={'text-decoration':'none','font-style': 'italic'}),
+                html.A(dbc.ListGroupItem("GHG Scope 2 Emissions", color="secondary", action=True), href="#gs2e", style={'text-decoration':'none','font-style': 'italic'}),
+                html.A(dbc.ListGroupItem("GHG Scope 3 Emissions", color="secondary", action=True), href="#gs3e", style={'text-decoration':'none','font-style': 'italic'}),
+                html.A(dbc.ListGroupItem("Water Utilization", color="secondary", action=True), href="#wut", style={'text-decoration':'none','font-style': 'italic'}),
+                html.A(dbc.ListGroupItem("Biodiversity Areas", color="secondary", action=True), href="#bare", style={'text-decoration':'none','font-style': 'italic'})
+            ],
+            horizontal=True,
+            className="mb-2",
+        )
+        
+    ]
+)
+
+list_group2 = html.Div(
+    [
+        dbc.ListGroup(
+            [
+                html.A(dbc.ListGroupItem("Governance Metrics", color="secondary", action=True), href="#gm", style={'text-decoration':'none','font-style': 'italic'}),
+                html.A(dbc.ListGroupItem("TCFD Disclosure Percentage", color="secondary", action=True), href="#tdp", style={'text-decoration':'none','font-style': 'italic'}),
+                html.A(dbc.ListGroupItem("Board Environmental Competency", color="secondary", action=True), href="#bec", style={'text-decoration':'none','font-style': 'italic'}),
+                html.A(dbc.ListGroupItem("Environmental Goals", color="secondary", action=True), href="#egs", style={'text-decoration':'none','font-style': 'italic'}),
+                html.A(dbc.ListGroupItem("Net Zero Targets", color="secondary", action=True), href="#ntz", style={'text-decoration':'none','font-style': 'italic'})
+            ],
+            horizontal="lg",
+        ),
+        html.Br()
+    ]
+)
 
 card11=dbc.Card([
-    dbc.CardHeader("Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Sector and Company Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-weight': 'bold','font-style': 'italic'}),
     dbc.CardBody(
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Sector",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Select Sector", style={ 'display': 'flex'}, id='ss1')],width=12),
+                dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="ss1")
+                
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1251,7 +1310,11 @@ card11=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Companies",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc1'),
+                dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="cc1")
+                    #html.P(" Add/remove companies using the dropdown",style={ 'display': 'flex',  'justify-content':'center'})
+                ],width=12)
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1264,7 +1327,7 @@ card11=dbc.Card([
 ],className="m-1")
 
 card12=dbc.Card([
-    dbc.CardHeader("Disclosure Status for Environmental Metrics",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Disclosure Status for Environmental Metrics",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}, id='dsfem'),
     dbc.CardBody(
         [
             dbc.Row([dbc.Col(dcc.Graph(id="trafficlight"))])
@@ -1273,12 +1336,14 @@ card12=dbc.Card([
 ],className="m-1")
 
 card21=dbc.Card([
-    dbc.CardHeader("Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Sector and Company Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
     dbc.CardBody(
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Sector",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Select Sector",style={ 'display': 'flex'}, id='ss2')],width=12),
+                dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="ss2")
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1291,7 +1356,10 @@ card21=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Companies",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                   html.P("Choose Companies", style={ 'display': 'flex'}, id='cc2'),
+                    dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="cc2")
+                    ],width=12)
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1304,7 +1372,7 @@ card21=dbc.Card([
 ],className="m-1")
 
 card22=dbc.Card([
-    dbc.CardHeader("GHG Scope 1 Emissions",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("GHG Scope 1 Emissions",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}, id='gs1e'),
     dbc.CardBody(
         [
             dbc.Row([dbc.Col(dcc.Graph(id="tghg1"))]),
@@ -1314,12 +1382,14 @@ card22=dbc.Card([
 ],className="m-1")
 
 card31=dbc.Card([
-    dbc.CardHeader("Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Sector and Company Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
     dbc.CardBody(
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Sector",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Select Sector",style={'display': 'flex'}, id='ss3')],width=12),
+                dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="ss3")
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1332,7 +1402,10 @@ card31=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Companies",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc3'),
+                dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="cc3")
+                    ],width=12)
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1345,7 +1418,7 @@ card31=dbc.Card([
 ],className="m-1")
 
 card32=dbc.Card([
-    dbc.CardHeader("GHG Scope 2 Emissions",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("GHG Scope 2 Emissions",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}, id='gs2e'),
     dbc.CardBody(
         [
             dbc.Row([dbc.Col(dcc.Graph(id="tghg2"))]),
@@ -1356,12 +1429,14 @@ card32=dbc.Card([
 
 
 card41=dbc.Card([
-    dbc.CardHeader("Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Sector and Company Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
     dbc.CardBody(
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Sector",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Select Sector",style={'display': 'flex'}, id='ss4')],width=12),
+                dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="ss4")
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1374,7 +1449,10 @@ card41=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Companies",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc4'),
+                dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="cc4")
+                    ],width=12)
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1387,7 +1465,7 @@ card41=dbc.Card([
 ],className="m-1")
 
 card42=dbc.Card([
-    dbc.CardHeader("GHG Scope 3 Emissions",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("GHG Scope 3 Emissions",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}, id='gs3e'),
     dbc.CardBody(
         [
             dbc.Row([dbc.Col(dcc.Graph(id="tghg3"))]),
@@ -1397,12 +1475,14 @@ card42=dbc.Card([
 ],className="m-1")
 
 card51=dbc.Card([
-    dbc.CardHeader("Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Sector and Company Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
     dbc.CardBody(
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Sector",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Select sector",style={ 'display': 'flex'}, id='ss5')],width=12),
+                dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="ss5")
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1415,7 +1495,10 @@ card51=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Companies",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc5'),
+                dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="cc5")
+                    ],width=12)
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1428,7 +1511,7 @@ card51=dbc.Card([
 ],className="m-1")
 
 card52=dbc.Card([
-    dbc.CardHeader("Water Utilization",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Water Utilization",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}, id='wut'),
     dbc.CardBody(
         [
             dbc.Row([dbc.Col(dcc.Graph(id="wu"))])
@@ -1437,12 +1520,14 @@ card52=dbc.Card([
 ],className="m-1")
 
 card61=dbc.Card([
-    dbc.CardHeader("Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Sector and Company Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
     dbc.CardBody(
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Sector",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Select Sector",style={ 'display': 'flex'}, id='ss6')],width=12),
+                dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="ss6")
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1455,7 +1540,10 @@ card61=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Companies",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc6'),
+                dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="cc6")
+                    ],width=12)
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1468,7 +1556,7 @@ card61=dbc.Card([
 ],className="m-1")
 
 card62=dbc.Card([
-    dbc.CardHeader("Biodiversity Areas",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Biodiversity Areas",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}, id='bare'),
     dbc.CardBody(
         [
             dbc.Row([dbc.Col(dcc.Graph(id="biod"))])
@@ -1477,12 +1565,14 @@ card62=dbc.Card([
 ],className="m-1")
 
 card71=dbc.Card([
-    dbc.CardHeader("Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Sector and Company Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
     dbc.CardBody(
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Sector",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Select Sector",style={ 'display': 'flex'}, id='ss7')],width=12),
+                dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="ss7")
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1495,7 +1585,10 @@ card71=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Companies",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc7'),
+                dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="cc7")
+                    ],width=12)
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1508,7 +1601,7 @@ card71=dbc.Card([
 ],className="m-1")
 
 card72=dbc.Card([
-    dbc.CardHeader("Governance Metrics",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Governance Metrics",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}, id="gm"),
     dbc.CardBody(
         [
             dbc.Row([dbc.Col(dcc.Graph(id="envmetgov"))])
@@ -1517,12 +1610,14 @@ card72=dbc.Card([
 ],className="m-1")
 
 card81=dbc.Card([
-    dbc.CardHeader("Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Sector and Company Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
     dbc.CardBody(
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Sector",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Select Sector",style={ 'display': 'flex'}, id='ss8')],width=12),
+                dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="ss8")
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1535,7 +1630,10 @@ card81=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Companies",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc8'),
+                dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="cc8")
+                    ],width=12)
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1548,7 +1646,7 @@ card81=dbc.Card([
 ],className="m-1")
 
 card82=dbc.Card([
-    dbc.CardHeader("TCFD Disclosure Percentage",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("TCFD Disclosure Percentage",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}, id='tdp'),
     dbc.CardBody(
         [
             dbc.Row([dbc.Col(dcc.Graph(id="tcfdper"))])
@@ -1558,12 +1656,14 @@ card82=dbc.Card([
 
 
 card91=dbc.Card([
-    dbc.CardHeader("Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Sector and Company Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
     dbc.CardBody(
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Sector",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Select Sector",style={ 'display': 'flex'}, id='ss9')],width=12),
+                dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="ss9")
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1576,7 +1676,10 @@ card91=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Companies",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc9'),
+                dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="cc9")
+                    ],width=12)
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1589,7 +1692,7 @@ card91=dbc.Card([
 ],className="m-1")
 
 card92=dbc.Card([
-    dbc.CardHeader("Percentage of board memebers with Environmental/Sustainability Capabilities",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Board Environmental Competency",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}, id='bec'),
     dbc.CardBody(
         [
             dbc.Row([dbc.Col(dcc.Graph(id="boardmem"))])
@@ -1599,12 +1702,14 @@ card92=dbc.Card([
 
 
 card101=dbc.Card([
-    dbc.CardHeader("Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Sector and Company Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
     dbc.CardBody(
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Sector",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Select Sector",style={ 'display': 'flex'}, id='ss10')],width=12),
+                dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="ss10")
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1617,7 +1722,10 @@ card101=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Companies",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc10'),
+                dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="cc10")
+                    ],width=12)
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1630,7 +1738,7 @@ card101=dbc.Card([
 ],className="m-1")
 
 card102=dbc.Card([
-    dbc.CardHeader("Environmental Goals",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Environmental Goals",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}, id='egs'),
     dbc.CardBody(
         [
             dbc.Row([dbc.Col(dcc.Graph(id="envigoals"))])
@@ -1640,12 +1748,14 @@ card102=dbc.Card([
 
 
 card111=dbc.Card([
-    dbc.CardHeader("Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Sector and Company Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
     dbc.CardBody(
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Sector",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Select Sector",style={ 'display': 'flex'}, id='ss11')],width=12),
+                dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="ss11")
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1658,7 +1768,10 @@ card111=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Companies",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc11'),
+                dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="cc11")
+                    ],width=12)
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1671,7 +1784,7 @@ card111=dbc.Card([
 ],className="m-1")
 
 card112=dbc.Card([
-    dbc.CardHeader("Net Zero Targets",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Net Zero Targets",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}, id="ntz"),
     dbc.CardBody(
         [
             dbc.Row([dbc.Col(dcc.Graph(id="nztar"))])
@@ -1686,26 +1799,26 @@ tab2card0=dbc.Card([
             dbc.Row([html.B("Climate Strategy Index is a sector-wise scoring methodology constructed to rank firms based on their environmental performance, governace and goals and relative weights assigned to each of these categories."),
                      html.B("Better overall strategy is associated with a higher index.")],style={"text-align":"center"}),
             html.Br(),
-            dbc.Row([
-                dbc.Col([],width=5),
-                dbc.Col([
-                    dbc.Button(
-                        "Download Logic Documentation",
-                        #href="/assets/Index Calculation.pdf",
-                        #download="Index Calculation.pdf",
-                        outline=True,
-                        style={"background-color": "#FDB71A"},
-                        #html.Button("Download Image", id="btn_image"),
-                        id="dnld_file"
-                        #color="Light"
-                        #size="sm",
-                        #className="mx-auto"
-                    ),
-                    dcc.Download(id="download_file")
-                ],width=2),
-                dbc.Col([],width=5),
+#             dbc.Row([
+#                 dbc.Col([],width=5),
+#                 dbc.Col([
+#                     dbc.Button(
+#                         "Download Logic Documentation",
+#                         #href="/assets/Index Calculation.pdf",
+#                         #download="Index Calculation.pdf",
+#                         outline=True,
+#                         style={"background-color": "#FDB71A"},
+#                         #html.Button("Download Image", id="btn_image"),
+#                         id="dnld_file"
+#                         #color="Light"
+#                         #size="sm",
+#                         #className="mx-auto"
+#                     ),
+#                     dcc.Download(id="download_file")
+#                 ],width=2),
+#                 dbc.Col([],width=5),
                 
-            ], className="d-flex justify-content-center"),
+#             ], className="d-flex justify-content-center"),
 #             dbc.Button(
 #                 "Download Logic Documentation",
 #                 href="/assets/Index Calculation.pdf",
@@ -1713,7 +1826,6 @@ tab2card0=dbc.Card([
 #                 #external_link=True,
 #                 style={"color":"C3D7EE","text-align":"center"},
 #             ),
-            html.Br(),
             dbc.Row([html.P("The Weights panel can be used to select the sector and appropriate weightage of each category"),
                      html.P("The Ranking panel provides the firm rankings for the selected sector based on the climate strategy index calculated as the weighted mean of environmental performance, governace and goal metrics of the respective firms"),
                      html.P("The Score Breakdown panel lists the features used to calculate each category's index based on an example firm. The example firm can also be added to the sector-level ranking list for comparison")
@@ -1728,7 +1840,9 @@ tab2card1=dbc.Card([
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Sector",style={ 'display': 'flex',  'justify-content':'center'})],width=12)
+                    html.P("Select Sector",style={ 'display': 'flex',  'justify-content':'center'}, id='ss12')],width=12),
+                dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
+                            style={"textDecoration": "underline", "cursor": "pointer"},target="ss12")
             ]),
             dbc.Row([
                 dbc.Col(
@@ -1766,8 +1880,17 @@ tab2card2=dbc.Card([
         [
             dbc.Row([dbc.Col(dcc.Graph(
                 id="overall_index"
-            ))])
-                ])
+            ))]),
+            dbc.Row([
+                dbc.Checklist(
+                        options=[
+                            {"label": "Add additional firm to ranked list", "value": 0}],
+                        id="newfirm_toggle",
+                        switch=True,
+                        #className="form-check-input"
+                        )
+            ])
+        ])
     
 ],className="m-1")
 
@@ -1833,19 +1956,19 @@ tab2card3=dbc.Card([
                             dbc.Label("Scope 1 Emission", width="auto",style={'font-style': 'italic'}),
                             html.I(className="bi bi-info-circle-fill me-2"),
                             dbc.Input(type="number", value=179.211, id="ghg1_input"),
-                            dbc.InputGroupText("kilo metric tons")],
+                            dbc.InputGroupText("thousand metric tons")],
                             className="me-3",
                         ),
                         dbc.Col([
                             dbc.Label("Scope 2 Emission (market-based)", width="auto",style={'font-style': 'italic'}),
                             dbc.Input(type="number", value=68.639, id="ghg2_input"),
-                            dbc.InputGroupText("kilo metric tons")],
+                            dbc.InputGroupText("thousand metric tons")],
                             className="me-3",
                         ),
                         dbc.Col([
                             dbc.Label("Scope 3 Emission", width="auto",style={'font-style': 'italic'}),
                             dbc.Input(type="number", value=5941.676, id="ghg3_input"),
-                            dbc.InputGroupText("kilo metric tons")],
+                            dbc.InputGroupText("thousand metric tons")],
                             className="me-3",
                         ),
                     ],
@@ -2061,41 +2184,35 @@ tab2card3=dbc.Card([
     
 ],className="m-1")
 
-tab2card4=dbc.Card([
-    #dbc.CardHeader("Climate Strategy Index",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
-    dbc.CardBody(
-        [
-            dbc.Row([
-                dbc.Checklist(
-                        options=[
-                            {"label": "Add additional firm to ranked list", "value": 0}],
-                        id="newfirm_toggle",
-                        switch=True,
-                        #className="form-check-input"
-                        )
-                ])
-        ])
-    
-],className="m-1")
+
+tab2card4=[dbc.Button(
+                        "For more information regarding index calculation, click here",
+                        outline=True,
+                        style={"background-color": "#FDB71A"},
+                        id="dnld_file"
+                    ),dcc.Download(id="download_file")]
 
 
 tab1 = html.Div([
-    dbc.Row([dbc.Col([card11],width=3),dbc.Col([card12],width=9)],className="mb-4 ml-3"),
-    dbc.Row([dbc.Col([card21],width=3),dbc.Col([card22],width=9)],className="mb-4 ml-3"),
-    dbc.Row([dbc.Col([card31],width=3),dbc.Col([card32],width=9)],className="mb-4 ml-3"),
-    dbc.Row([dbc.Col([card41],width=3),dbc.Col([card42],width=9)],className="mb-4 ml-3"),
-    dbc.Row([dbc.Col([card51],width=3),dbc.Col([card52],width=9)],className="mb-4 ml-3"),
-    dbc.Row([dbc.Col([card61],width=3),dbc.Col([card62],width=9)],className="mb-4 ml-3"),
-    dbc.Row([dbc.Col([card71],width=3),dbc.Col([card72],width=9)],className="mb-4 ml-3"),
-    dbc.Row([dbc.Col([card81],width=3),dbc.Col([card82],width=9)],className="mb-4 ml-3"),
-    dbc.Row([dbc.Col([card91],width=3),dbc.Col([card92],width=9)],className="mb-4 ml-3"),
-    dbc.Row([dbc.Col([card101],width=3),dbc.Col([card102],width=9)],className="mb-4 ml-3"),
-    dbc.Row([dbc.Col([card111],width=3),dbc.Col([card112],width=9)],className="mb-4 ml-3")
+    dbc.Row([dbc.Col([intro],width="auto")],className="m-1", justify="center"),
+    dbc.Row([dbc.Col([list_group1],width="auto")],className="m-1", justify="center"),
+    dbc.Row([dbc.Col([list_group2],width="auto")],className="m-1", justify="center"),
+    dbc.Row([dbc.Col([card11],width=3),dbc.Col([card12],width=9)],className="m-1"),
+    dbc.Row([dbc.Col([card21],width=3),dbc.Col([card22],width=9)],className="m-1"),
+    dbc.Row([dbc.Col([card31],width=3),dbc.Col([card32],width=9)],className="m-1"),
+    dbc.Row([dbc.Col([card41],width=3),dbc.Col([card42],width=9)],className="m-1"),
+    dbc.Row([dbc.Col([card51],width=3),dbc.Col([card52],width=9)],className="m-1"),
+    dbc.Row([dbc.Col([card61],width=3),dbc.Col([card62],width=9)],className="m-1"),
+    dbc.Row([dbc.Col([card71],width=3),dbc.Col([card72],width=9)],className="m-1"),
+    dbc.Row([dbc.Col([card81],width=3),dbc.Col([card82],width=9)],className="m-1"),
+    dbc.Row([dbc.Col([card91],width=3),dbc.Col([card92],width=9)],className="m-1"),
+    dbc.Row([dbc.Col([card101],width=3),dbc.Col([card102],width=9)],className="m-1"),
+    dbc.Row([dbc.Col([card111],width=3),dbc.Col([card112],width=9)],className="m-1")
 ])
 
-tab2 = html.Div([dbc.Row([tab2card0]),
-                 dbc.Row([dbc.Col([dbc.Row(tab2card1),dbc.Row(tab2card3)],width=6,),
-                          dbc.Col([dbc.Row(tab2card2),dbc.Row(tab2card4)],width=6)],className="mb-4 ml-3")
+tab2 = html.Div([dbc.Row([tab2card0],className="m-1"),
+                 dbc.Row([dbc.Col([dbc.Row(tab2card1,className="m-1"),dbc.Row(tab2card3,className="m-1")],width=6,),
+                          dbc.Col([dbc.Row(tab2card2,className="m-1"),dbc.Row(tab2card4,className="m-1")],width=6)])
                  #dbc.Row([dbc.Col([tab2card2],width=12)],className="mb-4 ml-3"),
                  #dbc.Row([dbc.Col([tab2card3],width=6)],className="mb-4 ml-3")
                 ])
@@ -2106,8 +2223,8 @@ app.layout = html.Div([
     dbc.Row([dbc.Col(navbar)],className="mb-4"),
     dcc.Tabs(id="tabs-styled-with-props", value='tab-1', 
              children=[
-        dcc.Tab(label='View 1', value='tab-1'),
-        dcc.Tab(label='View 2', value='tab-2'),
+        dcc.Tab(label='Environmental Disclosure and Performance Metrics', value='tab-1'),
+        dcc.Tab(label='Climate Strategy Index', value='tab-2'),
     ], 
              colors={
         "border": "white",
