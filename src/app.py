@@ -6,13 +6,16 @@ import numpy as np
 import plotly.graph_objects as go
 import re
 import pathlib
-import dash_auth
+#import dash_auth
+#import dash_mantine_components as dmc
 
 external_style = ['https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css']
 
 app = Dash(__name__, suppress_callback_exceptions=True,external_stylesheets=[dbc.themes.COSMO,external_style])
 app.title = 'Center for Impact Case Study'
 server = app.server
+
+
 
 # auth = dash_auth.BasicAuth(
 #     app,
@@ -182,21 +185,21 @@ def nghg1(sector,company_list):
     tnghg1 = tnghg1[masknz11]
     
     tnghg1_merged = tnghg1.merge(tghg1_sel10,on='Company')
-    tnghg1_merged['Normalised GHG1'] = tnghg1_merged['Total GHG1']*1000/tnghg1_merged['Revenue']
-    tnghg1_merged['Normalised GHG1 Rounded'] = pd.to_numeric(tnghg1_merged['Normalised GHG1']).round(2)
-    tnghg1_merged = tnghg1_merged.sort_values(by='Normalised GHG1', ascending=False)
+    tnghg1_merged['Normalized GHG1'] = tnghg1_merged['Total GHG1']*1000/tnghg1_merged['Revenue']
+    tnghg1_merged['Normalized GHG1 Rounded'] = pd.to_numeric(tnghg1_merged['Normalized GHG1']).round(2)
+    tnghg1_merged = tnghg1_merged.sort_values(by='Normalized GHG1', ascending=False)
 
     fontsize = 150/tnghg1_merged.shape[0]
     if (fontsize > 15):
         fontsize = 15
     
-    fig2 = px.bar(tnghg1_merged, x='Company', y='Normalised GHG1',text='Normalised GHG1 Rounded',color_discrete_sequence=['#2774AE'],height = 780)
+    fig2 = px.bar(tnghg1_merged, x='Company', y='Normalized GHG1',text='Normalized GHG1 Rounded',color_discrete_sequence=['#2774AE'],height = 780)
     fig2.update_layout(plot_bgcolor="white", font_family='Helvetica', title_font_family="Helvetica",font=dict(size=fontsize))
     fig2.update_xaxes(title=None)
     fig2.update_yaxes(title=None)
     fig2.update_layout(
     title=go.layout.Title(
-        text="Normalised GHG Scope 1 Emissions<br><sup>(in metric tons per $M revenue)</sup>",
+        text="Normalized GHG Scope 1 Emissions<br><sup>(in metric tons per $M revenue)</sup>",
         #xref="paper",
         x=0.5,
         font_size=30
@@ -286,14 +289,14 @@ def nghg2(sector,company_list):
     tnghg2 = tnghg2[masknz22]
     
     tnghg2_merged = tnghg2.merge(tghg2,on='Company')
-    tnghg2_merged['Normalised market-based GHG2'] = tnghg2_merged['Total market-based GHG2']/tnghg2_merged['Revenue']
-    tnghg2_merged['Normalised location-based GHG2'] = tnghg2_merged['Total location-based GHG 2']/tnghg2_merged['Revenue']
-    tnghg2_merged['Normalised uncategorised GHG2'] = tnghg2_merged['Total uncategorised GHG 2']/tnghg2_merged['Revenue']
+    tnghg2_merged['Normalized market-based GHG2'] = tnghg2_merged['Total market-based GHG2']/tnghg2_merged['Revenue']
+    tnghg2_merged['Normalized location-based GHG2'] = tnghg2_merged['Total location-based GHG 2']/tnghg2_merged['Revenue']
+    tnghg2_merged['Normalized uncategorised GHG2'] = tnghg2_merged['Total uncategorised GHG 2']/tnghg2_merged['Revenue']
     tnghg2_merged.drop(labels=['Revenue','Total market-based GHG2','Total location-based GHG 2','Total uncategorised GHG 2'], axis=1, inplace=True)
     
     tnghg2_melted = pd.melt(tnghg2_merged, id_vars='Company')
 #tghg2_melted[['Scope 2 type']] = re.search(r'Total(.*?)GHG', tghg2_melted['variable'])
-    tnghg2_melted['Scope 2 Category'] = tnghg2_melted['variable'].apply(lambda x: re.search(r'Normalised(.*?)GHG', x).group(1).strip() if re.search(r'Normalised(.*?)GHG', x) else None)
+    tnghg2_melted['Scope 2 Category'] = tnghg2_melted['variable'].apply(lambda x: re.search(r'Normalized(.*?)GHG', x).group(1).strip() if re.search(r'Normalized(.*?)GHG', x) else None)
     tnghg2_melted['value'] = pd.to_numeric(tnghg2_melted['value'], errors='coerce')
     tnghg2_melted['value_rounded'] = (tnghg2_melted['value']).round(2).astype(str).str.replace('nan', 'NR')
 
@@ -323,7 +326,7 @@ def nghg2(sector,company_list):
     fig322.update_yaxes(title=None)
     fig322.update_layout(
     title=go.layout.Title(
-        text="Normalised GHG Scope 2 Emissions<br><sup>(in metric tons per $M revenue)</sup>",
+        text="Normalized GHG Scope 2 Emissions<br><sup>(in metric tons per $M revenue)</sup>",
         #xref="paper",
         x=0.5,
         font_size = 30
@@ -428,8 +431,8 @@ def tnghg3(sector,company_list,k1,pp):
     tnghg3 = tnghg3[masknz33]
     
     tnghg33_merged = tghg3_sel10.merge(tnghg3, on='Company')
-    tnghg33_merged['Normalised GHG3'] = (tnghg33_merged['Total GHG3']*1000)/tnghg33_merged['Revenue']
-    tnghg33_merged['Normalised GHG3 Rounded'] = tnghg33_merged['Normalised GHG3'].round(2)
+    tnghg33_merged['Normalized GHG3'] = (tnghg33_merged['Total GHG3']*1000)/tnghg33_merged['Revenue']
+    tnghg33_merged['Normalized GHG3 Rounded'] = tnghg33_merged['Normalized GHG3'].round(2)
     
     tnghg33_merged = tnghg33_merged.sort_values(by=['Total GHG3','Company'], axis = 0, ascending=False)
 
@@ -508,20 +511,20 @@ def water_util(sector,company_list):
 def biodiver(sector,company_list):
     dfbi = df.loc[:,['GICS.Sector','Company.Name','Revenue','CM9.Area.in.hectares']]
     dfbi = dfbi.rename(columns={"Company.Name":"CompanyName","CM9.Area.in.hectares":"Biodiversity Areas"})
-    dfbi['Normalised Biodiversity Areas'] = dfbi['Biodiversity Areas']/dfbi['Revenue']
+    dfbi['Normalized Biodiversity Areas'] = dfbi['Biodiversity Areas']/dfbi['Revenue']
     
     dfbi = dfbi.loc[dfbi['GICS.Sector'] == sector]
-    dfbi['value_rounded'] = dfbi['Normalised Biodiversity Areas'].round(2).astype(str).str.replace('nan', 'NR')
+    dfbi['value_rounded'] = dfbi['Normalized Biodiversity Areas'].round(2).astype(str).str.replace('nan', 'NR')
     #dfbi_sorted = dfbi.sort_values(by='value_rounded', axis=0, ascending=False).head(10)
     
     mask7 = dfbi['CompanyName'].isin(company_list)
-    dfbi_prev10 = dfbi[mask7].sort_values(by='Normalised Biodiversity Areas', axis=0, ascending=False)
+    dfbi_prev10 = dfbi[mask7].sort_values(by='Normalized Biodiversity Areas', axis=0, ascending=False)
 
     fontsize = 150/dfbi_prev10.shape[0]
     if (fontsize > 15):
         fontsize = 15
     
-    fig7 = px.bar(dfbi_prev10, x="CompanyName", y="Normalised Biodiversity Areas",text='value_rounded', color_discrete_sequence=['#2774AE','#FFB81C','#F47C30'],barmode="group", height = 780)
+    fig7 = px.bar(dfbi_prev10, x="CompanyName", y="Normalized Biodiversity Areas",text='value_rounded', color_discrete_sequence=['#2774AE','#FFB81C','#F47C30'],barmode="group", height = 780)
     fig7.update_layout(plot_bgcolor="white", font_family='Helvetica', title_font_family="Helvetica",
                   font=dict(size=fontsize))
 
@@ -936,24 +939,24 @@ def index_calculator(sector, company_list, governance_weight, goals_weight, perf
     #################################
         
     
-    envperf_merged['Normalised GHG1'] = pd.to_numeric(envperf_merged['Total GHG1'])/envperf_merged['Revenue']
-    envperf_merged['Normalised GHG2'] = envperf_merged['Total market-based GHG2']/envperf_merged['Revenue']
-    envperf_merged['Normalised GHG3'] = envperf_merged['Total GHG3']/envperf_merged['Revenue']
-    envperf_merged['Normalised Water Consumption'] = envperf_merged['Water Consumption']/envperf_merged['Revenue']
-    envperf_merged['Normalised Water Withdrawal'] = envperf_merged['Water Withdrawal']/envperf_merged['Revenue']
-    envperf_merged['Normalised Biodiversity Areas'] = envperf_merged['Biodiversity Areas']/envperf_merged['Revenue']
+    envperf_merged['Normalized GHG1'] = pd.to_numeric(envperf_merged['Total GHG1'])/envperf_merged['Revenue']
+    envperf_merged['Normalized GHG2'] = envperf_merged['Total market-based GHG2']/envperf_merged['Revenue']
+    envperf_merged['Normalized GHG3'] = envperf_merged['Total GHG3']/envperf_merged['Revenue']
+    envperf_merged['Normalized Water Consumption'] = envperf_merged['Water Consumption']/envperf_merged['Revenue']
+    envperf_merged['Normalized Water Withdrawal'] = envperf_merged['Water Withdrawal']/envperf_merged['Revenue']
+    envperf_merged['Normalized Biodiversity Areas'] = envperf_merged['Biodiversity Areas']/envperf_merged['Revenue']
     
     envperf_prev10 = envperf_merged
 
 #     mask8 = envperf_merged['Company'].isin(company_list)
 #     envperf_prev10 = envperf_merged[mask8]
     
-    envperf_prev10['GHG1 Percentile Rank'] = (1-envperf_prev10['Normalised GHG1'].rank(pct=True)).fillna(0)
-    envperf_prev10['GHG2 Percentile Rank'] = (1-envperf_prev10['Normalised GHG2'].rank(pct=True)).fillna(0)
-    envperf_prev10['GHG3 Percentile Rank'] = (1-envperf_prev10['Normalised GHG3'].rank(pct=True)).fillna(0)
-    envperf_prev10['Water Consumption Percentile Rank'] = (1-envperf_prev10['Normalised Water Consumption'].rank(pct=True)).fillna(0)
-    envperf_prev10['Water Withdrawal Percentile Rank'] = (1-envperf_prev10['Normalised Water Withdrawal'].rank(pct=True)).fillna(0)
-    envperf_prev10['Biodiversity Areas Percentile Rank'] = (envperf_prev10['Normalised Biodiversity Areas'].rank(pct=True)).fillna(0)
+    envperf_prev10['GHG1 Percentile Rank'] = (1-envperf_prev10['Normalized GHG1'].rank(pct=True)).fillna(0)
+    envperf_prev10['GHG2 Percentile Rank'] = (1-envperf_prev10['Normalized GHG2'].rank(pct=True)).fillna(0)
+    envperf_prev10['GHG3 Percentile Rank'] = (1-envperf_prev10['Normalized GHG3'].rank(pct=True)).fillna(0)
+    envperf_prev10['Water Consumption Percentile Rank'] = (1-envperf_prev10['Normalized Water Consumption'].rank(pct=True)).fillna(0)
+    envperf_prev10['Water Withdrawal Percentile Rank'] = (1-envperf_prev10['Normalized Water Withdrawal'].rank(pct=True)).fillna(0)
+    envperf_prev10['Biodiversity Areas Percentile Rank'] = (envperf_prev10['Normalized Biodiversity Areas'].rank(pct=True)).fillna(0)
     
     envperf_prev10['envperfscore'] = envperf_prev10[['GHG1 Percentile Rank','GHG2 Percentile Rank','GHG3 Percentile Rank','Water Consumption Percentile Rank','Water Withdrawal Percentile Rank','Biodiversity Areas Percentile Rank']].mean(axis=1)
     envperf_prev10 = envperf_prev10.sort_values(by='envperfscore', axis=0, ascending=False)
@@ -1128,24 +1131,24 @@ def overallindex(sector, company_list, governance_weight, goals_weight, performa
     #################################
         
     
-    envperf_merged['Normalised GHG1'] = pd.to_numeric(envperf_merged['Total GHG1'])/envperf_merged['Revenue']
-    envperf_merged['Normalised GHG2'] = envperf_merged['Total market-based GHG2']/envperf_merged['Revenue']
-    envperf_merged['Normalised GHG3'] = envperf_merged['Total GHG3']/envperf_merged['Revenue']
-    envperf_merged['Normalised Water Consumption'] = envperf_merged['Water Consumption']/envperf_merged['Revenue']
-    envperf_merged['Normalised Water Withdrawal'] = envperf_merged['Water Withdrawal']/envperf_merged['Revenue']
-    envperf_merged['Normalised Biodiversity Areas'] = envperf_merged['Biodiversity Areas']/envperf_merged['Revenue']
+    envperf_merged['Normalized GHG1'] = pd.to_numeric(envperf_merged['Total GHG1'])/envperf_merged['Revenue']
+    envperf_merged['Normalized GHG2'] = envperf_merged['Total market-based GHG2']/envperf_merged['Revenue']
+    envperf_merged['Normalized GHG3'] = envperf_merged['Total GHG3']/envperf_merged['Revenue']
+    envperf_merged['Normalized Water Consumption'] = envperf_merged['Water Consumption']/envperf_merged['Revenue']
+    envperf_merged['Normalized Water Withdrawal'] = envperf_merged['Water Withdrawal']/envperf_merged['Revenue']
+    envperf_merged['Normalized Biodiversity Areas'] = envperf_merged['Biodiversity Areas']/envperf_merged['Revenue']
     
     envperf_prev10 = envperf_merged
 
 #     mask8 = envperf_merged['Company'].isin(company_list)
 #     envperf_prev10 = envperf_merged[mask8]
     
-    envperf_prev10['GHG1 Percentile Rank'] = (1-envperf_prev10['Normalised GHG1'].rank(pct=True)).fillna(0)
-    envperf_prev10['GHG2 Percentile Rank'] = (1-envperf_prev10['Normalised GHG2'].rank(pct=True)).fillna(0)
-    envperf_prev10['GHG3 Percentile Rank'] = (1-envperf_prev10['Normalised GHG3'].rank(pct=True)).fillna(0)
-    envperf_prev10['Water Consumption Percentile Rank'] = (1-envperf_prev10['Normalised Water Consumption'].rank(pct=True)).fillna(0)
-    envperf_prev10['Water Withdrawal Percentile Rank'] = (1-envperf_prev10['Normalised Water Withdrawal'].rank(pct=True)).fillna(0)
-    envperf_prev10['Biodiversity Areas Percentile Rank'] = (envperf_prev10['Normalised Biodiversity Areas'].rank(pct=True)).fillna(0)
+    envperf_prev10['GHG1 Percentile Rank'] = (1-envperf_prev10['Normalized GHG1'].rank(pct=True)).fillna(0)
+    envperf_prev10['GHG2 Percentile Rank'] = (1-envperf_prev10['Normalized GHG2'].rank(pct=True)).fillna(0)
+    envperf_prev10['GHG3 Percentile Rank'] = (1-envperf_prev10['Normalized GHG3'].rank(pct=True)).fillna(0)
+    envperf_prev10['Water Consumption Percentile Rank'] = (1-envperf_prev10['Normalized Water Consumption'].rank(pct=True)).fillna(0)
+    envperf_prev10['Water Withdrawal Percentile Rank'] = (1-envperf_prev10['Normalized Water Withdrawal'].rank(pct=True)).fillna(0)
+    envperf_prev10['Biodiversity Areas Percentile Rank'] = (envperf_prev10['Normalized Biodiversity Areas'].rank(pct=True)).fillna(0)
     
     envperf_prev10['envperfscore'] = envperf_prev10[['GHG1 Percentile Rank','GHG2 Percentile Rank','GHG3 Percentile Rank','Water Consumption Percentile Rank','Water Withdrawal Percentile Rank','Biodiversity Areas Percentile Rank']].mean(axis=1)
     envperf_prev10 = envperf_prev10.sort_values(by='envperfscore', axis=0, ascending=False)
@@ -1252,7 +1255,11 @@ navbar = dbc.Navbar(
 
 intro = html.Div([
     html.Br(),
-    html.H5("This page provides a comparitive sector-based analysis based on the following metrics:")])
+    html.H5("This page provides a comparitive sector-based analysis based on the following metrics:"),
+    #dmc.Button("Scroll to Top"), position={"bottom": 10, "right": 20},href = "#top"
+    html.A(dbc.Button("Scroll to top", style={'background-color':'#313339','color':'#FFFFFF'}), href="#top", style={'position':'fixed','bottom':'20px', 'right':'20px', 'z-index':'100'})
+    
+], id = 'top')
 
 list_group1 = html.Div(
     [
@@ -1286,6 +1293,7 @@ list_group2 = html.Div(
         ),
         html.Br()
     ]
+    #, style = {'position':'fixed','top':'10', 'width':'100%', 'z-index':'100'}
 )
 
 card11=dbc.Card([
@@ -1793,11 +1801,12 @@ card112=dbc.Card([
 ],className="m-1")
 
 tab2card0=dbc.Card([
-    dbc.CardHeader("Climate Strategy Index",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Climate Strategy Index",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}, id='top2'),
     dbc.CardBody(
         [
             dbc.Row([html.B("Climate Strategy Index is a sector-wise scoring methodology constructed to rank firms based on their environmental performance, governace and goals and relative weights assigned to each of these categories."),
                      html.B("Better overall strategy is associated with a higher index.")],style={"text-align":"center"}),
+            html.A(dbc.Button("Scroll to top", style={'background-color':'#313339','color':'#FFFFFF'}), href="#top2", style={'position':'fixed','bottom':'20px', 'right':'20px', 'z-index':'100'}),
             html.Br(),
 #             dbc.Row([
 #                 dbc.Col([],width=5),
@@ -1930,7 +1939,7 @@ tab2card3=dbc.Card([
                 html.Br(),
                 dbc.Row([
                     dbc.Col([
-                        html.H5(["Environmental Performance Index is the average sector-based percentile ranking of the following Metrics normalised by revenue"])],width=9),
+                        html.H5(["Environmental Performance Index is the average sector-based percentile ranking of the following Metrics normalized by revenue"])],width=9),
                     dbc.Col([dbc.Button("What is Percentile Ranking?", id="per_rank_exp", n_clicks=0, outline=True, color="secondary", className="me-1")],width=3),
                     #html.H5([""]),
                             #html.Span("percentile ranking", id="percentile_tooltip"),
@@ -2188,7 +2197,7 @@ tab2card3=dbc.Card([
 tab2card4=[dbc.Button(
                         "For more information regarding index calculation, click here",
                         outline=True,
-                        style={"background-color": "#FDB71A"},
+                        style={"background-color": "#FDB71A","color":"#000000"},
                         id="dnld_file"
                     ),dcc.Download(id="download_file")]
 
@@ -2325,7 +2334,7 @@ def update_companylist4(sector):
     [Input('company_select4', 'value')]
 )
 def update_tghg3(sector,company_list):
-    fignorm=tnghg3(sector,company_list,"Normalised GHG3",1)
+    fignorm=tnghg3(sector,company_list,"Normalized GHG3",1)
     figtotal=tnghg3(sector,company_list,"Total GHG3",2)
     return figtotal, fignorm 
 
